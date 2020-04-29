@@ -3,7 +3,20 @@
 #include <math.h>
 
 Grid::Grid() {
+  setupVertices();
+  addNumbersToIndices(m_indices, 0, 0);
+}
 
+Grid::~Grid() {
+
+}
+
+void Grid::setupVertices() {
+  float lineSpacing = 100.0f;
+  float totalWidth = 10000.0f;
+
+  int arrayElementsForPairOfVertices = 2 * arrayElementsForOneVertex;
+  
 	int vertexArrayLength = 6000;
 	int vertexCount = (int)((float)vertexArrayLength / (float)arrayElementsForOneVertex);
 	setup(vertexCount, vertexCount);
@@ -44,13 +57,6 @@ Grid::Grid() {
 		if (vertexIndex  > 2) m_vertices.at(i) = 0.0f;
 
 	}
-
-  addNumbersToIndices(m_indices, 0, 0);
-
-}
-
-Grid::~Grid() {
-
 }
 
 void Grid::addNumbersToIndices(std::vector<unsigned int>& data, unsigned int dataIndex, unsigned int index) {

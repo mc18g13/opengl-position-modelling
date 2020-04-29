@@ -6,14 +6,11 @@
 class Grid : public Renderable {
 public:
 	Grid();
-	void addNumbersToIndices(std::vector<unsigned int>& data, unsigned int dataIndex, unsigned int index);
 	virtual ~Grid();
-
-    float lineSpacing = 100.0f;
-    float totalWidth = 6000.0f;
-
-    int arrayElementsForPairOfVertices = 2 * arrayElementsForOneVertex;
-
+  
+private:
+	void addNumbersToIndices(std::vector<unsigned int>& data, unsigned int dataIndex, unsigned int index);
+  void setupVertices();
 };
 
 #endif
