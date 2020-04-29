@@ -18,11 +18,6 @@
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Grid.h"
-#include "Cube.h"
-#include "Orientation.h"
-#include "Cylinder.h"
-
 #include "PlotArea.h"
 #include "TrackableObject.h"
 
@@ -162,23 +157,9 @@ int main( void ) {
         lastFrame = currentFrame;
 
         abc += 0.6;
-        
-        vec3 positionView(0,abc, abc);
-
-        //         View = glm::lookAt(
-        //   positionView + vec3(150.f,150.f,600.f),
-        //   positionView,
-        //   glm::vec3(0.f,1.f,0.f)
-        // );
-
-
         mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) halfScreenWidth / (float)halfScreenHeight, 1.0f, 50000.0f);
-        // glm::mat4 projection = glm::perspective(, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        // ourShader.setMat4("projection", projection);
 
-        // camera/view transformation
         mat4 view = camera.getViewMatrix();
-        // ourShader.setMat4("view", view);
 
         plotArea.setProjection(projection);
         trackableObject.setProjection(projection);
@@ -225,10 +206,7 @@ int main( void ) {
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
+void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     camera.processKeyboard(FORWARD, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

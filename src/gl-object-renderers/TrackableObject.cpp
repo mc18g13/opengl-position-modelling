@@ -6,7 +6,7 @@ TrackableObject::TrackableObject(const Renderer& renderer)
   : ObjectRenderer(renderer) {
 
   const float LENGTH = 100.0f;
-  const float RADIUS = 4.0f;
+  const float RADIUS = 5.0f;
   Cylinder orientationXAxis(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), LENGTH, RADIUS);
   Cylinder orientationYAxis(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), LENGTH, RADIUS);
   Cylinder orientationZAxis(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), LENGTH, RADIUS);
@@ -41,7 +41,7 @@ void TrackableObject::setPosition(const vec3& position) {
     m_positions.push_back(position);
   }
 
-  const size_t MAX_POSITIONS_IN_HISTORY = 100;
+  const size_t MAX_POSITIONS_IN_HISTORY = 10;
   if (m_positions.size() >= MAX_POSITIONS_IN_HISTORY) {
     m_positions.pop_front();
   }
