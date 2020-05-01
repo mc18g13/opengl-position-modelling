@@ -19,6 +19,7 @@ public:
   void setPosition(const vec3& position);
   void setOrientation(const quat& orientation);
   void setOrientation(const mat4& orientation);
+  void setAxisScale(const mat4& scale);
 };
 
 #endif

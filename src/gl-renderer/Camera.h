@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 enum Camera_Movement {
   FORWARD,
@@ -13,13 +15,14 @@ enum Camera_Movement {
 
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float SPEED       =  200.5f;
+const float SPEED       =  500.0f;
 const float SENSITIVITY =  0.1f;
-const float ZOOM        =  45.0f;
+const float ZOOM        =  250.0f;
 
 
 class Camera {
 private:
+  glm::quat m_rotationFromZeroEulersAtPositionToOrigin;
   glm::vec3 m_position;
   glm::vec3 m_front;
   glm::vec3 m_up;
@@ -36,14 +39,9 @@ private:
 public:
 
   Camera(
-    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f), 
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), 
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
     float yaw = YAW, float pitch = PITCH);
-
-  Camera(
-    float posX, float posY, float posZ, 
-    float upX, float upY, float upZ, 
-    float yaw, float pitch);
 
   const float getZoom();
 
@@ -60,5 +58,6 @@ public:
 private:
   // Calculates the m_front vector from the Camera's (updated) Euler Angles
   void updateCameraVectors();
+  void printVec(glm::vec3& vector);
 };
 #endif

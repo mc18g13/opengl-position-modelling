@@ -12,18 +12,20 @@ Grid::~Grid() {
 }
 
 void Grid::setupVertices() {
-  float lineSpacing = 100.0f;
+  float lineSpacing = 1000.0f;
   float totalWidth = 10000.0f;
+
+  float linesPerDirection = (totalWidth / lineSpacing) + 1;
 
   int arrayElementsForPairOfVertices = 2 * arrayElementsForOneVertex;
   
-	int vertexArrayLength = 6000;
-	int vertexCount = (int)((float)vertexArrayLength / (float)arrayElementsForOneVertex);
+	int vertexArrayLength = linesPerDirection * 4 * arrayElementsForPairOfVertices;
+	int vertexCount = (int)((float)vertexArrayLength / (float)arrayElementsForPairOfVertices);
 	setup(vertexCount, vertexCount);
 	float numberOfLines = vertexCount / 2;
 	float numberOfLinesInOneDirection = numberOfLines / 2;
 	float extentWidth = round(numberOfLinesInOneDirection * lineSpacing / 100) * 100;
-	float startPosition = -extentWidth / 2;
+	float startPosition = 0;//-extentWidth / 2;
 
 //	std::cout << "numberOfVertices" << numberOfVertices << std::endl;
 //	std::cout << "numberOfLines" << numberOfLines << std::endl;
@@ -34,29 +36,32 @@ void Grid::setupVertices() {
   float currentGridLineX = startPosition;
   float currentGridLineZ = startPosition;
 
-	for (unsigned int i = 0; i < m_vertices.size(); i++) {
+  unsigned int endForX = m_vertices.size() / 2 - 1;
 
+  for (unsigned int i = 0; i < endForX; ++i) {
 		int vertexIndex = i % arrayElementsForOneVertex;
 		bool isEvenIteration = i % arrayElementsForPairOfVertices >= arrayElementsForOneVertex;
 
-		if (i <= m_vertices.size() / 2) {
+    if (i % 12 == 0 && i > 0) currentGridLineX += lineSpacing;
+    if (vertexIndex == 0) m_vertices.at(i) = currentGridLineX;
+    if (vertexIndex == 2) m_vertices.at(i) = isEvenIteration ? 0 : totalWidth;
 
-			if (i % 12 == 0) currentGridLineX += lineSpacing;
-			if (vertexIndex == 0) m_vertices.at(i) = currentGridLineX;
-			if (vertexIndex == 2) m_vertices.at(i) = isEvenIteration ? -totalWidth : totalWidth;
-
-		} else {
-
-			if (i % 12 == 0) currentGridLineZ += lineSpacing;
-			if (vertexIndex == 0) m_vertices.at(i) = isEvenIteration ? -totalWidth : totalWidth;
-			if (vertexIndex == 2) m_vertices.at(i) = currentGridLineZ;
-
-		}
-
-		if (vertexIndex == 1) m_vertices.at(i) = 0.0f;
+    if (vertexIndex == 1) m_vertices.at(i) = 0.0f;
 		if (vertexIndex  > 2) m_vertices.at(i) = 0.0f;
+  }
 
-	}
+  unsigned int startIndexForZ = endForX + 1; 
+  for (unsigned int i = startIndexForZ; i < m_vertices.size() - 1; ++i) {
+		int vertexIndex = i % arrayElementsForOneVertex;
+		bool isEvenIteration = i % arrayElementsForPairOfVertices >= arrayElementsForOneVertex;
+
+    if (i % 12 == 0 && i > startIndexForZ) currentGridLineZ += lineSpacing;
+    if (vertexIndex == 0) m_vertices.at(i) = isEvenIteration ? 0 : totalWidth;
+    if (vertexIndex == 2) m_vertices.at(i) = currentGridLineZ;
+
+    if (vertexIndex == 1) m_vertices.at(i) = 0.0f;
+		if (vertexIndex  > 2) m_vertices.at(i) = 0.0f;
+  }
 }
 
 void Grid::addNumbersToIndices(std::vector<unsigned int>& data, unsigned int dataIndex, unsigned int index) {

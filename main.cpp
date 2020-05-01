@@ -49,8 +49,9 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+const glm::vec3 STARTING_CAMERA_LOCATION(1500.f,1500.f,2000.f);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 1000.0f));
+Camera camera(STARTING_CAMERA_LOCATION);
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -110,6 +111,15 @@ GLFWwindow* InitWindow()
     return window;
 }
 
+mat4 swapXAndY(const mat4& mat) {
+  constexpr mat4 SWAP_X_AND_Y(
+    1,0,0,0,
+    0,0,1,0,
+    0,1,0,0,
+    0,0,0,1);
+  return SWAP_X_AND_Y * mat;
+}
+
 int main( void ) {
     GLFWwindow* window = InitWindow();
     if (!window)
@@ -122,13 +132,16 @@ int main( void ) {
     GLCall( glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) );
 
     {
-    	float screenWidth  = 960.0f;
-    	float screenHeight = 540.0f;
-    	float screenDepth  = 10*2000.0f;
+    	constexpr float SCREEN_WIDTH  = 960.0f;
+    	constexpr float SCREEN_HEIGHT = 540.0f;
 
-    	float halfScreenWidth = screenWidth/2;
-    	float halfScreenHeight = screenHeight/2;
-    	float halfScreenDepth = screenDepth/2;
+    	constexpr float HALF_SCREEN_WIDTH = SCREEN_WIDTH/2;
+    	constexpr float HALF_SCREEN_HEIGHT = SCREEN_HEIGHT/2;
+
+      constexpr float PLOTTING_SCALE  = 4000;
+      constexpr float PLOTTING_WIDTH  = PLOTTING_SCALE * HALF_SCREEN_WIDTH;
+    	constexpr float PLOTTING_HEIGHT = PLOTTING_SCALE * HALF_SCREEN_HEIGHT;
+      constexpr float PLOTTING_DEPTH  = 50000.0f;
 
       Shader shader("src/gl-renderer/res/shaders/Basic.shader");
       shader.bind();
@@ -157,26 +170,33 @@ int main( void ) {
         lastFrame = currentFrame;
 
         abc += 0.6;
-        mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) halfScreenWidth / (float)halfScreenHeight, 1.0f, 50000.0f);
 
-        mat4 view = camera.getViewMatrix();
+        // mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) HALF_SCREEN_DEPTH / (float)HALF_SCREEN_HEIGHT, 1.0f, 50000.0f);
+
+        float zoom = camera.getZoom();
+        mat4 projection = glm::ortho(
+          -PLOTTING_WIDTH/zoom, PLOTTING_WIDTH/zoom, 
+          -PLOTTING_HEIGHT/zoom, PLOTTING_HEIGHT/zoom, 
+          -PLOTTING_DEPTH, PLOTTING_DEPTH);
 
         plotArea.setProjection(projection);
         trackableObject.setProjection(projection);
+        
+        mat4 view = camera.getViewMatrix();
         plotArea.setView(view);
         trackableObject.setView(view);
         
         glEnable(GL_DEPTH_TEST);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-        renderer.Clear();
+        renderer.clear();
 
         glStencilMask(0x00);
         
         plotArea.setModel(sceneModel);
         plotArea.draw(shader);
 
-        vec3 position(0,abc + (rand() % 20 - 20),abc + (rand() % 20 - 20));
+        vec3 position(abc,abc + (rand() % 20 - 20),abc + (rand() % 20 - 20));
         trackableObject.resetModel();
         trackableObject.setPosition(position);
         trackableObject.setOrientation(rotate(mat4(1.0f), glm::radians(abc), vec3(1, 0, 0)));
@@ -190,17 +210,17 @@ int main( void ) {
         frameCount++;
 
         if ( currentTime - previousTime >= 1.0 ) {
-            frameCount = 0;
-            previousTime = currentTime;
+          frameCount = 0;
+          previousTime = currentTime;
         }
 
-      } // Check if the ESC key was pressed or the window was closed
-      while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-             glfwWindowShouldClose(window) == 0 );
+      } while( 
+        glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+        glfwWindowShouldClose(window) == 0 
+      );
 
     }
 
-    // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
     return 0;

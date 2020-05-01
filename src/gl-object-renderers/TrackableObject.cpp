@@ -18,7 +18,7 @@ TrackableObject::TrackableObject(const Renderer& renderer)
   Renderable orientationAxes = orientationXAxis + orientationYAxis + orientationZAxis;
   Renderable orienationAxesOutline = orientationXAxisOutline + orientationYAxisOutline + orientationZAxisOutline;
 
-  m_trackableObject = std::make_unique<RenderableData>(orientationAxes);
+  m_trackableObject        = std::make_unique<RenderableData>(orientationAxes);
   m_trackableObjectOutline = std::make_unique<RenderableData>(orienationAxesOutline);
 
 }
@@ -41,12 +41,12 @@ void TrackableObject::setPosition(const vec3& position) {
     m_positions.push_back(position);
   }
 
-  const size_t MAX_POSITIONS_IN_HISTORY = 10;
+  const size_t MAX_POSITIONS_IN_HISTORY = 100;
   if (m_positions.size() >= MAX_POSITIONS_IN_HISTORY) {
     m_positions.pop_front();
   }
 
-  const float RADIUS = 1;
+  const float RADIUS = 20;
   const vec3 color = vec3(0.0f, 0.0f, 0.0f);
 
   std::unique_ptr<Renderable> path;
@@ -66,6 +66,7 @@ void TrackableObject::setPosition(const vec3& position) {
     }
 
   }
+
   if (path) {
     m_historyData = std::make_unique<RenderableData>(*path);
   }
@@ -108,4 +109,8 @@ void TrackableObject::draw(Shader& shader) {
     m_renderer.draw(*m_historyData, shader, GL_TRIANGLE_STRIP);
   }
   
+}
+
+void TrackableObject::setAxisScale(const mat4& scale) {
+  setModel(getModel() * scale);
 }

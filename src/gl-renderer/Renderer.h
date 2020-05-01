@@ -10,7 +10,7 @@
 
 class Renderer
 {
-    public:
-        void Clear() const;
-        void draw(const RenderableData& object, const Shader& shader, unsigned int geometryType) const;
+public:
+  void clear() const;
+  void draw(const RenderableData& object, const Shader& shader, unsigned int geometryType) const;
 };

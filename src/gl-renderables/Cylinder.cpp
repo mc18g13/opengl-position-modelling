@@ -3,7 +3,7 @@
 #include <iostream>
 
 Cylinder::Cylinder(vec3 unitVectorDirectionOfCylinder, vec3 startPointCoordinate, vec3 color, float length, float radius) {
-	unsigned int vertexCount = 20;
+	unsigned int vertexCount = 10;
   const unsigned int INDICES_FOR_EACH_VERTEX = 3;
 	unsigned int indexCount = INDICES_FOR_EACH_VERTEX * vertexCount;
 	setup(vertexCount, indexCount);
@@ -21,7 +21,7 @@ void Cylinder::calculateVertices(
 	unsigned int iterationsForPairsOfVertices = (m_vertexCount / 2);
 
 	vec3 centreLineOfCylinder(0.0f, 0.0f, 1.0f);
-	quat rotationToUpdateDirection = RotationBetweenVectors(unitVectorDirectionOfCylinder, centreLineOfCylinder);
+	quat rotationToUpdateDirection = rotationBetweenVectors(unitVectorDirectionOfCylinder, centreLineOfCylinder);
 
 	float angle = 2 * M_PI / (float)(iterationsForPairsOfVertices - 1);
 	for (unsigned int i = 0; i < iterationsForPairsOfVertices; i++) {
