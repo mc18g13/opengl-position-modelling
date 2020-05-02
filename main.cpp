@@ -49,7 +49,7 @@ void processInput(GLFWwindow *window);
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-const glm::vec3 STARTING_CAMERA_LOCATION(1500.f,1500.f,2000.f);
+const glm::vec3 STARTING_CAMERA_LOCATION(1000.f,300.f,1000.f);
 
 Camera camera(STARTING_CAMERA_LOCATION);
 float lastX = SCR_WIDTH / 2.0f;
@@ -111,15 +111,6 @@ GLFWwindow* InitWindow()
     return window;
 }
 
-mat4 swapXAndY(const mat4& mat) {
-  constexpr mat4 SWAP_X_AND_Y(
-    1,0,0,0,
-    0,0,1,0,
-    0,1,0,0,
-    0,0,0,1);
-  return SWAP_X_AND_Y * mat;
-}
-
 int main( void ) {
     GLFWwindow* window = InitWindow();
     if (!window)
@@ -138,10 +129,10 @@ int main( void ) {
     	constexpr float HALF_SCREEN_WIDTH = SCREEN_WIDTH/2;
     	constexpr float HALF_SCREEN_HEIGHT = SCREEN_HEIGHT/2;
 
-      constexpr float PLOTTING_SCALE  = 4000;
+      constexpr float PLOTTING_SCALE  = 400;
       constexpr float PLOTTING_WIDTH  = PLOTTING_SCALE * HALF_SCREEN_WIDTH;
     	constexpr float PLOTTING_HEIGHT = PLOTTING_SCALE * HALF_SCREEN_HEIGHT;
-      constexpr float PLOTTING_DEPTH  = 50000.0f;
+      constexpr float PLOTTING_DEPTH  = 10000.0f;
 
       Shader shader("src/gl-renderer/res/shaders/Basic.shader");
       shader.bind();
@@ -169,7 +160,7 @@ int main( void ) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        abc += 0.6;
+        abc += 0.1;
 
         // mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) HALF_SCREEN_DEPTH / (float)HALF_SCREEN_HEIGHT, 1.0f, 50000.0f);
 
@@ -177,7 +168,7 @@ int main( void ) {
         mat4 projection = glm::ortho(
           -PLOTTING_WIDTH/zoom, PLOTTING_WIDTH/zoom, 
           -PLOTTING_HEIGHT/zoom, PLOTTING_HEIGHT/zoom, 
-          -PLOTTING_DEPTH, PLOTTING_DEPTH);
+          -PLOTTING_DEPTH * 1000/zoom, PLOTTING_DEPTH* 1000/zoom);
 
         plotArea.setProjection(projection);
         trackableObject.setProjection(projection);

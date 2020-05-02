@@ -24,7 +24,7 @@ class Camera {
 private:
   glm::quat m_rotationFromZeroEulersAtPositionToOrigin;
   glm::vec3 m_position;
-  glm::vec3 m_front;
+  glm::vec3 m_directionCameraIsFacing;
   glm::vec3 m_up;
   glm::vec3 m_right;
   glm::vec3 m_worldUp;
@@ -44,20 +44,14 @@ public:
     float yaw = YAW, float pitch = PITCH);
 
   const float getZoom();
-
-  // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
   glm::mat4 getViewMatrix();
 
   void processKeyboard(Camera_Movement direction, float deltaTime);
-
   void processMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-
-  // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
   void processMouseScroll(float yoffset);
 
 private:
-  // Calculates the m_front vector from the Camera's (updated) Euler Angles
   void updateCameraVectors();
-  void printVec(glm::vec3& vector);
+  void printVec(glm::vec3& vector, const char* name);
 };
 #endif

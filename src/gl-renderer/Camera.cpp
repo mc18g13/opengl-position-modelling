@@ -11,12 +11,12 @@ namespace {
 Camera::Camera(
   glm::vec3 position, glm::vec3 up,
   float yaw, float pitch) : 
-    m_front(PERPENDICULAR_TO_SCREEN), 
+    m_directionCameraIsFacing(PERPENDICULAR_TO_SCREEN), 
     m_movementSpeed(SPEED), 
     m_mouseSensitivity(SENSITIVITY), 
     m_zoom(ZOOM)
 {
-  m_rotationFromZeroEulersAtPositionToOrigin = GLMathematics::rotationBetweenVectors(m_front, -position);
+  // m_rotationFromZeroEulersAtPositionToOrigin = GLMathematics::rotationBetweenVectors(position + m_directionCameraIsFacing, position);
   m_position         = position;
   m_worldUp          = up;
   m_yaw              = yaw;
@@ -31,23 +31,23 @@ const float Camera::getZoom() {
 
 glm::mat4 Camera::getViewMatrix() {
   return glm::lookAt(
+    m_position + m_directionCameraIsFacing, 
     m_position, 
-    m_position + m_front, 
     m_up);
 }
 
 void Camera::processKeyboard(Camera_Movement direction, float deltaTime) {
   float velocity = m_movementSpeed * deltaTime;
+  vec3 changeInXZPlane(m_directionCameraIsFacing.x,0.0f,m_directionCameraIsFacing.z);
+  changeInXZPlane = glm::normalize(changeInXZPlane);
   if (direction == FORWARD)
-    m_position += m_front * velocity;
+    m_position += changeInXZPlane * velocity;
   if (direction == BACKWARD)
-    m_position -= m_front * velocity;
+    m_position -= changeInXZPlane * velocity;
   if (direction == LEFT)
     m_position -= m_right * velocity;
   if (direction == RIGHT)
     m_position += m_right * velocity;
-
-  printVec(m_position);
 }
 
 
@@ -84,26 +84,27 @@ void Camera::updateCameraVectors() {
 
   glm::vec3 euler = glm::eulerAngles(m_rotationFromZeroEulersAtPositionToOrigin);
 
-  float pitchOffset = euler.x * 180 / M_PI;
-  float yawOffset   = euler.y * 180 / M_PI;
+  float pitchOffset = glm::degrees(euler.x);
+  float yawOffset   = glm::degrees(euler.y);
 
-  float pitchWithOffset = m_pitch + pitchOffset;
-  float yawWithOffset   = m_yaw   - yawOffset;
+  float pitchWithOffset = m_pitch - pitchOffset;
+  float yawWithOffset   = m_yaw   + yawOffset;
 
+  
+  m_directionCameraIsFacing.x = cos(glm::radians(yawWithOffset)) * cos(glm::radians(pitchWithOffset));
+  m_directionCameraIsFacing.y = sin(glm::radians(pitchWithOffset));
+  m_directionCameraIsFacing.z = sin(glm::radians(yawWithOffset)) * cos(glm::radians(pitchWithOffset));
 
-  m_front.x = cos(glm::radians(yawWithOffset)) * cos(glm::radians(pitchWithOffset));
-  m_front.y = sin(glm::radians(pitchWithOffset));
-  m_front.z = sin(glm::radians(yawWithOffset)) * cos(glm::radians(pitchWithOffset));
+  m_directionCameraIsFacing   = glm::normalize(m_directionCameraIsFacing);
 
-  m_front   = glm::normalize(m_front);
-
-  m_right = glm::normalize(glm::cross(m_front, m_worldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-  m_up    = glm::normalize(glm::cross(m_right, m_front));
+  m_right = glm::normalize(glm::cross(m_directionCameraIsFacing, m_worldUp));
+  m_up    = glm::normalize(glm::cross(m_right, m_directionCameraIsFacing));
 
 }
 
-void Camera::printVec(glm::vec3& vector) {
-  std::cout << vector.x << " "
+void Camera::printVec(glm::vec3& vector, const char* name) {
+  std::cout << name << " " 
+            << vector.x << " "
             << vector.y << " "
-            << vector.z << std::endl;
+            << vector.z << std::endl << std::endl;
 }

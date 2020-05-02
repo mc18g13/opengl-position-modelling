@@ -7,10 +7,10 @@
 PlotArea::PlotArea(const Renderer& renderer) 
   : ObjectRenderer(renderer) {
 
-  const float LENGTH = 10000.0f;
-  const float RADIUS = 4.0f;
+  const float LENGTH = 1000.0f;
+  const float RADIUS = 2.0f;
 
-  Grid grid;
+  Grid grid(LENGTH, LENGTH/10);
   Cylinder xAxis(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 0.0f, 0.0f), LENGTH, RADIUS);
   Cylinder yAxis(vec3(0.0f, 1.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f), LENGTH, RADIUS);
   Cylinder zAxis(vec3(0.0f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f), LENGTH, RADIUS);

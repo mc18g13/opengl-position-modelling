@@ -5,12 +5,12 @@
 
 class Grid : public Renderable {
 public:
-	Grid();
+	Grid(float totalWidth = 1000.0f, float lineSpacing = 100.0f);
 	virtual ~Grid();
   
 private:
 	void addNumbersToIndices(std::vector<unsigned int>& data, unsigned int dataIndex, unsigned int index);
-  void setupVertices();
+  void setupVertices(float totalWidth, float lineSpacing);
 };
 
 #endif

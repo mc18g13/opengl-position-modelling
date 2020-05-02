@@ -9,7 +9,7 @@ class TrackableObject : public ObjectRenderer {
 private:
   std::unique_ptr<RenderableData> m_trackableObject;
   std::unique_ptr<RenderableData> m_trackableObjectOutline;
-  std::unique_ptr<RenderableData> m_historyData;
+  std::vector<std::shared_ptr<RenderableData>> m_historyData;
   std::deque<vec3> m_positions;
 public:
   TrackableObject(const Renderer& renderer);

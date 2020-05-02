@@ -31,7 +31,7 @@ void TrackableObject::setPosition(const vec3& position) {
   setModel(translate(getModel(), position));
   if (m_positions.size() > 0) {
     vec3 lastPosition = m_positions.back();
-    const float distanceFromLastPlottedLocationToPlot = 50.0f;
+    const float distanceFromLastPlottedLocationToPlot = 1.0f;
     if (glm::distance(position, lastPosition) > distanceFromLastPlottedLocationToPlot) {
       m_positions.push_back(position);
     }
@@ -41,16 +41,14 @@ void TrackableObject::setPosition(const vec3& position) {
     m_positions.push_back(position);
   }
 
-  const size_t MAX_POSITIONS_IN_HISTORY = 100;
+  const size_t MAX_POSITIONS_IN_HISTORY = 10000;
   if (m_positions.size() >= MAX_POSITIONS_IN_HISTORY) {
     m_positions.pop_front();
   }
 
-  const float RADIUS = 20;
-  const vec3 color = vec3(0.0f, 0.0f, 0.0f);
+  const float RADIUS = 0.5;
+  const vec3 color = vec3(0.1f, 0.3f, 0.1f);
 
-  std::unique_ptr<Renderable> path;
- 
   for (int i = 0; i < m_positions.size() - 1; ++i) {
     vec3 olderPosition = m_positions.at(i);
     vec3 newerPosition = m_positions.at(i + 1);
@@ -60,15 +58,12 @@ void TrackableObject::setPosition(const vec3& position) {
     float length = distance(olderPosition, newerPosition);
     if (i == 0) {
       Cylinder startPath(vectorToNewPosition, olderPosition, color, length, RADIUS);
-      path = std::make_unique<Renderable>(startPath);
+      m_historyData.push_back(std::make_shared<RenderableData>(startPath));
     } else {
-      *path += Cylinder(vectorToNewPosition, olderPosition, color, length, RADIUS);
+      Cylinder nextLineSegment(vectorToNewPosition, olderPosition, color, length, RADIUS);
+      m_historyData.push_back(std::make_shared<RenderableData>(nextLineSegment));
     }
 
-  }
-
-  if (path) {
-    m_historyData = std::make_unique<RenderableData>(*path);
   }
   
 }
@@ -103,10 +98,13 @@ void TrackableObject::draw(Shader& shader) {
   // Cylinder orientationXAxisOutline(vec3(1.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f), LENGTH + 1, RADIUS + 1);
   // history.printIndices();
 
-  if (m_historyData) {
+  if (m_historyData.size() > 0) {
     setModel(mat4(1.0f));
     shader.SetUniformMat4f("u_MVP", getMVP());
-    m_renderer.draw(*m_historyData, shader, GL_TRIANGLE_STRIP);
+    for (auto lineSegmentInHistory : m_historyData) {
+      m_renderer.draw(*lineSegmentInHistory, shader, GL_TRIANGLE_STRIP);
+    }
+    m_historyData.clear();
   }
   
 }
