@@ -41,7 +41,7 @@ void TrackableObject::setPosition(const vec3& position) {
     m_positions.push_back(position);
   }
 
-  const size_t MAX_POSITIONS_IN_HISTORY = 10000;
+  const size_t MAX_POSITIONS_IN_HISTORY = 1000;
   if (m_positions.size() >= MAX_POSITIONS_IN_HISTORY) {
     m_positions.pop_front();
   }

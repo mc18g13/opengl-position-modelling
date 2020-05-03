@@ -1,34 +1,16 @@
 // Include GLEW
 #include <GL/glew.h>
-
-// Include GLFW
 #include <GLFW/glfw3.h>
-
-#include <iostream>
-
-#include "Shader.h"
-#include "Renderer.h"
-#include "Texture.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "PlotArea.h"
-#include "TrackableObject.h"
-
-#include "Camera.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
-#include "glm/gtc/quaternion.hpp"
-#include "glm/gtx/quaternion.hpp"
-
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -37,9 +19,19 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <vector>
 
+#include <iostream>
+#include <vector>
 #include <cstdlib>
+
+#include "Shader.h"
+#include "Renderer.h"
+#include "Texture.h"
+#include "PlotArea.h"
+#include "TrackableObject.h"
+#include "Camera.h"
+#include "Model.h"
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -92,7 +84,7 @@ GLFWwindow* InitWindow()
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
@@ -145,11 +137,9 @@ int main( void ) {
       PlotArea plotArea(renderer);
       TrackableObject trackableObject(renderer);
 
-    	mat4 View = mat4();
       mat4 sceneModel = mat4(1.0f);
 
-      mat4 MVPOrientation = mat4(1.0f);
-      mat4 MVPScene = mat4(1.0f);
+      Model stateModel;
 
       float abc = 0;
       do {
@@ -160,7 +150,7 @@ int main( void ) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        abc += 0.1;
+        abc += 0.6;
 
         // mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) HALF_SCREEN_DEPTH / (float)HALF_SCREEN_HEIGHT, 1.0f, 50000.0f);
 
@@ -210,9 +200,12 @@ int main( void ) {
         glfwWindowShouldClose(window) == 0 
       );
 
+      stateModel.stop();
     }
 
     glfwTerminate();
+
+
 
     return 0;
 }
@@ -234,21 +227,27 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-  if (firstMouse) {
-      lastX = xpos;
-      lastY = ypos;
-      firstMouse = false;
-  }
 
-  float xoffset = xpos - lastX;
-  float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+  int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+  if (state == GLFW_PRESS) {
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+
+
+    camera.processMouseMovement(xoffset, yoffset);
+  }
 
   lastX = xpos;
   lastY = ypos;
-
-  camera.processMouseMovement(xoffset, yoffset);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
