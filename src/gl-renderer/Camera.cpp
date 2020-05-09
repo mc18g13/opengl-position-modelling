@@ -44,9 +44,9 @@ void Camera::processKeyboard(Camera_Movement direction, float deltaTime) {
   if (direction == BACKWARD)
     m_position -= changeInXZPlane * velocity;
   if (direction == LEFT)
-    m_position += m_right * velocity;
-  if (direction == RIGHT)
     m_position -= m_right * velocity;
+  if (direction == RIGHT)
+    m_position += m_right * velocity;
 }
 
 
