@@ -13,8 +13,8 @@ enum Camera_Movement {
   RIGHT
 };
 
-const float YAW         = -90.0f;
-const float PITCH       =  0.0f;
+const float YAW         = -135.0f;
+const float PITCH       =  -45.0f;
 const float SPEED       =  500.0f;
 const float SENSITIVITY =  0.1f;
 const float ZOOM        =  250.0f;
@@ -22,7 +22,6 @@ const float ZOOM        =  250.0f;
 
 class Camera {
 private:
-  glm::quat m_rotationFromZeroEulersAtPositionToOrigin;
   glm::vec3 m_position;
   glm::vec3 m_directionCameraIsFacing;
   glm::vec3 m_up;

@@ -3,58 +3,36 @@
 
 #include <future>
 #include <vector>
-#include <eigen3/Eigen/Dense>
-#include "Timer.h"
 
-class PathPlanner {
-private:
-  std::vector<Eigen::Vector3d> m_pathPoints;
-  void calculateRandomPathPoints(int pointCount, Eigen::Vector3d startPoint, Eigen::Vector3d endpoint) {
-    
-  }
-};
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 
-class InertialSensor {
-private:
-  Eigen::Vector3d m_data;
-public:
-  Eigen::Vector3d getData() {
-    return m_data;
-  }
-};
-
-class Gyroscope : public InertialSensor {
-  
-};
-
-class Accelerometer : public InertialSensor {
-
-};
-
-class PositionEstimator {
-private:
-  Eigen::Vector3d m_position;
-public:
-  Eigen::Vector3d getPosition() {
-    return m_position;
-  }
-};
+#include "PathPlanner.h"
+#include "GyroSimulator.h"
 
 
 class Model {
 private:
-  std::promise<void> m_exitSignal;
-  std::future<void>  m_exitSignalFuture;
-  std::thread        m_modellingThread;
-  Timer              m_timer;
+  std::promise<void>                   m_exitSignal;
+  std::future<void>                    m_exitSignalFuture;
+  PathPlanner                          m_pathPlanner;
+  GyroSimulator                        m_gyroSimulator;
+  int                                  m_pathIndex;
+  std::promise<Eigen::Vector3f>        m_currentPosition;
+  std::shared_future<Eigen::Vector3f>  m_currentPositionFuture;
+  std::thread                          m_modellingThread;
 
+  
 public:
   Model();
   ~Model();
   void execute();
   void stop();
+  std::shared_future<Eigen::Vector3f> getPosition();
+  int getIndex();
+
+private:
   bool stopRequested();
-  void waitForNextUpdateInterval(); 
 };
 
 #endif

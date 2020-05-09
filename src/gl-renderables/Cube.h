@@ -68,4 +68,4 @@ public:
 	};
 };
 
-#endif /* CUBE_H_ */
+#endif

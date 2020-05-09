@@ -9,8 +9,7 @@ class TrackableObject : public ObjectRenderer {
 private:
   std::unique_ptr<RenderableData> m_trackableObject;
   std::unique_ptr<RenderableData> m_trackableObjectOutline;
-  std::vector<std::shared_ptr<RenderableData>> m_historyData;
-  std::deque<vec3> m_positions;
+  
 public:
   TrackableObject(const Renderer& renderer);
   virtual void draw(Shader& shader) override;
@@ -18,8 +17,7 @@ public:
   void resetModel();
   void setPosition(const vec3& position);
   void setOrientation(const quat& orientation);
-  void setOrientation(const mat4& orientation);
-  void setAxisScale(const mat4& scale);
+  void setOrientation(const float angleDegrees, const vec3& angleAxis);
 };
 
 #endif

@@ -19,6 +19,9 @@ public:
   ObjectRenderer(const Renderer& renderer);
   virtual void draw(Shader& shader) = 0;
 
+  void translateModel(const vec3& translation);
+  void rotateModel(const float angleDegrees, const vec3& angleAxis);
+
   void setModel(const mat4& model);
   void setView(const mat4& view);
   void setProjection(const mat4& projection);

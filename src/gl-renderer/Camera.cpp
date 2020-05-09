@@ -16,7 +16,6 @@ Camera::Camera(
     m_mouseSensitivity(SENSITIVITY), 
     m_zoom(ZOOM)
 {
-  // m_rotationFromZeroEulersAtPositionToOrigin = GLMathematics::rotationBetweenVectors(position + m_directionCameraIsFacing, position);
   m_position         = position;
   m_worldUp          = up;
   m_yaw              = yaw;
@@ -31,8 +30,8 @@ const float Camera::getZoom() {
 
 glm::mat4 Camera::getViewMatrix() {
   return glm::lookAt(
-    m_position + m_directionCameraIsFacing, 
     m_position, 
+    m_position + m_directionCameraIsFacing, 
     m_up);
 }
 
@@ -82,14 +81,8 @@ void Camera::processMouseScroll(float yoffset) {
 
 void Camera::updateCameraVectors() {  
 
-  glm::vec3 euler = glm::eulerAngles(m_rotationFromZeroEulersAtPositionToOrigin);
-
-  float pitchOffset = glm::degrees(euler.x);
-  float yawOffset   = glm::degrees(euler.y);
-
-  float pitchWithOffset = m_pitch - pitchOffset;
-  float yawWithOffset   = m_yaw   + yawOffset;
-
+  float pitchWithOffset = m_pitch;
+  float yawWithOffset   = m_yaw  ;
   
   m_directionCameraIsFacing.x = cos(glm::radians(yawWithOffset)) * cos(glm::radians(pitchWithOffset));
   m_directionCameraIsFacing.y = sin(glm::radians(pitchWithOffset));

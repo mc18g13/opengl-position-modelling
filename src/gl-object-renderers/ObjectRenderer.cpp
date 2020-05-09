@@ -5,6 +5,16 @@ ObjectRenderer::ObjectRenderer(const Renderer& renderer)
 
 }
 
+void ObjectRenderer::translateModel(const vec3& translation)
+{
+  m_model = translate(m_model, translation);
+}
+
+void ObjectRenderer::rotateModel(const float angleDegrees, const vec3& angleAxis)
+{
+  m_model = rotate(m_model, glm::radians(angleDegrees), angleAxis);
+}
+
 void ObjectRenderer::setModel(const mat4& model) {
   m_model = model;
 }

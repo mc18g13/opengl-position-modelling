@@ -38,7 +38,7 @@ void Grid::setupVertices(float totalWidth, float lineSpacing) {
 //	std::cout << "startPosition" << startPosition << std::endl;
 
   float currentGridLineX = startPosition;
-  float currentGridLineY = startPosition;
+  float currentGridLineZ = startPosition;
 
   unsigned int endForX = m_vertices.size() / 2 - 1;
 
@@ -48,22 +48,22 @@ void Grid::setupVertices(float totalWidth, float lineSpacing) {
 
     if (i % 12 == 0 && i > 0) currentGridLineX += lineSpacing;
     if (vertexIndex == INDEX_X) m_vertices.at(i) = currentGridLineX;
-    if (vertexIndex == INDEX_Y) m_vertices.at(i) = isEvenIteration ? 0 : totalWidth;
+    if (vertexIndex == INDEX_Z) m_vertices.at(i) = isEvenIteration ? 0 : totalWidth;
 
-    if (vertexIndex == INDEX_Z) m_vertices.at(i) = 0.0f;
+    if (vertexIndex == INDEX_Y) m_vertices.at(i) = 0.0f;
 		if (vertexIndex  > INDEX_Z) m_vertices.at(i) = 0.0f;
   }
 
-  unsigned int startIndexForY = endForX + 1; 
-  for (unsigned int i = startIndexForY; i < m_vertices.size() - 1; ++i) {
+  unsigned int startIndexForZ = endForX + 1; 
+  for (unsigned int i = startIndexForZ; i < m_vertices.size() - 1; ++i) {
 		int vertexIndex = i % arrayElementsForOneVertex;
 		bool isEvenIteration = i % arrayElementsForPairOfVertices >= arrayElementsForOneVertex;
 
-    if (i % 12 == 0 && i > startIndexForY) currentGridLineY += lineSpacing;
+    if (i % 12 == 0 && i > startIndexForZ) currentGridLineZ += lineSpacing;
     if (vertexIndex == INDEX_X) m_vertices.at(i) = isEvenIteration ? 0 : totalWidth;
-    if (vertexIndex == INDEX_Y) m_vertices.at(i) = currentGridLineY;
+    if (vertexIndex == INDEX_Z) m_vertices.at(i) = currentGridLineZ;
 
-    if (vertexIndex == INDEX_Z) m_vertices.at(i) = 0.0f;
+    if (vertexIndex == INDEX_Y) m_vertices.at(i) = 0.0f;
 		if (vertexIndex  > INDEX_Z) m_vertices.at(i) = 0.0f;
   }
 }

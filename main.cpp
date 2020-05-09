@@ -15,9 +15,8 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/common.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 
 #include <iostream>
@@ -28,20 +27,21 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "PlotArea.h"
+#include "PlotPath.h"
 #include "TrackableObject.h"
 #include "Camera.h"
 #include "Model.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void mouseCallback(GLFWwindow* window, double xpos, double ypos);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-const glm::vec3 STARTING_CAMERA_LOCATION(1000.f,300.f,1000.f);
+const glm::vec3 STARTING_CAMERA_LOCATION(1000.f,1000.f,1000.f);
 
 Camera camera(STARTING_CAMERA_LOCATION);
 float lastX = SCR_WIDTH / 2.0f;
@@ -54,7 +54,7 @@ float lastFrame = 0.0f;
 
 using namespace std;
 
-GLFWwindow* InitWindow()
+GLFWwindow* initWindow()
 {
     // Initialise GLFW
     if( !glfwInit() ) {
@@ -80,8 +80,8 @@ GLFWwindow* InitWindow()
 
     glfwMakeContextCurrent(window);
 
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 
     // tell GLFW to capture our mouse
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -103,8 +103,12 @@ GLFWwindow* InitWindow()
     return window;
 }
 
+vec3 stateSpaceToGraphicSpace(Eigen::Vector3f& state) {
+  return vec3(state[1], state[2], state[0]);
+}
+
 int main( void ) {
-    GLFWwindow* window = InitWindow();
+    GLFWwindow* window = initWindow();
     if (!window)
         return -1;
 
@@ -136,6 +140,7 @@ int main( void ) {
 
       PlotArea plotArea(renderer);
       TrackableObject trackableObject(renderer);
+      PlotPath objectPath(renderer);
 
       mat4 sceneModel = mat4(1.0f);
 
@@ -146,12 +151,12 @@ int main( void ) {
 
         processInput(window);
 
+        // while (glfwGetTime() - lastFrame < 0.2);
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        abc += 0.6;
-
+        abc += 1;
         // mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float) HALF_SCREEN_DEPTH / (float)HALF_SCREEN_HEIGHT, 1.0f, 50000.0f);
 
         float zoom = camera.getZoom();
@@ -162,11 +167,13 @@ int main( void ) {
 
         plotArea.setProjection(projection);
         trackableObject.setProjection(projection);
+        objectPath.setProjection(projection);
         
         mat4 view = camera.getViewMatrix();
         plotArea.setView(view);
         trackableObject.setView(view);
-        
+        objectPath.setView(view);
+
         glEnable(GL_DEPTH_TEST);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
@@ -177,13 +184,27 @@ int main( void ) {
         plotArea.setModel(sceneModel);
         plotArea.draw(shader);
 
-        vec3 position(abc,abc + (rand() % 20 - 20),abc + (rand() % 20 - 20));
-        trackableObject.resetModel();
-        trackableObject.setPosition(position);
-        trackableObject.setOrientation(rotate(mat4(1.0f), glm::radians(abc), vec3(1, 0, 0)));
+        std::shared_future<Eigen::Vector3f> futurePosition = stateModel.getPosition();
+
+        if (futurePosition.wait_for(std::chrono::milliseconds(5)) != std::future_status::timeout) {
+          Eigen::Vector3f position = futurePosition.get();
+          glm::vec3 positionDrawable = stateSpaceToGraphicSpace(position);
+
+          // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");
+          // std::cout << position.format(cleanFmt) << std::endl;
+
+          trackableObject.resetModel();
+          trackableObject.setPosition(positionDrawable);
+          trackableObject.setOrientation(abc, vec3(1, 0, 0));
+
+          objectPath.addPosition(positionDrawable);
+        }
+
         trackableObject.draw(shader);
 
-        // Swap buffers
+        objectPath.setModel(sceneModel);
+        objectPath.draw(shader);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
 
@@ -206,7 +227,7 @@ int main( void ) {
     glfwTerminate();
 
 
-
+ 
     return 0;
 }
 
@@ -227,7 +248,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
   int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
   if (state == GLFW_PRESS) {
@@ -241,8 +262,6 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
-
-
     camera.processMouseMovement(xoffset, yoffset);
   }
 
@@ -250,9 +269,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
   lastY = ypos;
 }
 
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
   camera.processMouseScroll(yoffset);
 }

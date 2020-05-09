@@ -24,7 +24,7 @@ void Cylinder::calculateVertices(
 	quat rotationToUpdateDirection = rotationBetweenVectors(unitVectorDirectionOfCylinder, centreLineOfCylinder);
 
 	float angle = 2 * M_PI / (float)(iterationsForPairsOfVertices - 1);
-	for (unsigned int i = 0; i < iterationsForPairsOfVertices; i++) {
+	for (unsigned int i = 0; i < iterationsForPairsOfVertices; ++i) {
 		int j = i * 12;
 
     float x = cos(currentAngle) * radius;
