@@ -42,7 +42,7 @@ public:
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), 
     float yaw = YAW, float pitch = PITCH);
 
-  const float getZoom();
+  float getZoom();
   glm::mat4 getViewMatrix();
 
   void processKeyboard(Camera_Movement direction, float deltaTime);

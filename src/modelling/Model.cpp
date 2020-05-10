@@ -2,6 +2,8 @@
 #include <chrono>
 #include <iostream>
 
+using Eigen::Vector3f;
+
 namespace {
   constexpr double SECONDS_TO_MILLIS  = 1000;
   constexpr double UPDATE_FREQUENCY   = 4;
@@ -13,7 +15,9 @@ Model::Model() :
   m_exitSignal(),
   m_exitSignalFuture(m_exitSignal.get_future()),
   m_pathPlanner(),
-  m_gyroSimulator(m_pathPlanner.getPath()),
+  m_gyroSimulator(m_pathPlanner.getPath(), UPDATE_INTERVAL_S),
+  m_accelerometerSimulator(m_pathPlanner.getPath(), UPDATE_INTERVAL_S),
+  m_positionSensorSimulator(m_pathPlanner.getPath(), UPDATE_INTERVAL_S),
   m_pathIndex(0),
   m_currentPosition(),
   m_currentPositionFuture(m_currentPosition.get_future()),
@@ -28,9 +32,18 @@ Model::~Model() {
 
 void Model::execute() {
   while (!stopRequested()) {
-    std::vector<Eigen::Vector3f> path = m_pathPlanner.getPath();
+    std::vector<Vector3f> path = m_pathPlanner.getPath();
+    
+
     if (m_pathIndex < path.size()) {
-      Eigen::Vector3f pathPoint = path.at(m_pathIndex);
+      
+    }
+    Vector3f position = m_positionSensorSimulator.getDataFor(m_pathIndex);
+      
+    
+    if (m_pathIndex < path.size()) {
+      Vector3f pathPoint = path.at(m_pathIndex);
+      
       if (m_currentPositionFuture.valid() ) {
         
         bool currentPositionShouldBeUpdated = 
@@ -42,6 +55,8 @@ void Model::execute() {
       } else {
         std::cout << "not valid" << std::endl;
       }
+
+      
     }
 
   }
@@ -52,9 +67,9 @@ void Model::stop() {
   m_exitSignal.set_value();
 }
 
-std::shared_future<Eigen::Vector3f> Model::getPosition() {
+std::shared_future<Vector3f> Model::getPosition() {
   m_pathIndex++;
-  m_currentPosition = std::promise<Eigen::Vector3f>();
+  m_currentPosition = std::promise<Vector3f>();
   m_currentPositionFuture = m_currentPosition.get_future();
   return m_currentPositionFuture;
 }

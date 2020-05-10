@@ -4,11 +4,13 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # set(CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14") 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
 find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+find_package(Eigen3 REQUIRED)
 
 pkg_search_module(GLFW REQUIRED glfw3)
 
@@ -18,6 +20,7 @@ include_directories ("src/gl-renderables")
 include_directories ("src/gl-renderer")
 include_directories ("src/gl-object-renderers")
 include_directories ("src/modelling")
+include_directories ("src/modelling/sensor-simulators")
 
 file(GLOB COMMON_SRC
   "src/common/*.h"
@@ -32,14 +35,15 @@ file(GLOB GL_RENDERABLES_SRC
 add_library (gl-renderables STATIC ${GL_RENDERABLES_SRC})
 
 file(GLOB GL_RENDERER_SRC
-    "src/gl-renderer/*.h"
-    "src/gl-renderer/*.cpp"
+  "src/gl-renderer/*.h"
+  "src/gl-renderer/*.cpp"
 )
 add_library (gl-renderer ${GL_RENDERER_SRC})
 target_link_libraries(gl-renderer OpenGL::OpenGL)
 
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_subdirectory (src/gl-renderables) 
 add_subdirectory (src/gl-renderer)

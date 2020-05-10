@@ -24,7 +24,7 @@ Camera::Camera(
   updateCameraVectors();
 }
 
-const float Camera::getZoom() {
+float Camera::getZoom() {
   return m_zoom;
 }
 

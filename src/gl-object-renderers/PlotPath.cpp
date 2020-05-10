@@ -33,7 +33,7 @@ void PlotPath::draw(Shader& shader) {
   constexpr float RADIUS = 0.5;
   constexpr vec3 color = vec3(0.1f, 0.3f, 0.1f);
 
-  for (int i = 0; i < m_positions.size() - 1; ++i) {
+  for (size_t i = 0; i < m_positions.size() - 1; ++i) {
     vec3 olderPosition = m_positions.at(i);
     vec3 newerPosition = m_positions.at(i + 1);
 

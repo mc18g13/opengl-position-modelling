@@ -12,7 +12,7 @@ using Eigen::AngleAxisf;
 
 PathPlanner::PathPlanner() :
   m_pathPoints() {
-  setupPathPoints(500);
+  setupPathPoints(2000);
 }
 
 std::vector<Eigen::Vector3f> PathPlanner::getPath() {

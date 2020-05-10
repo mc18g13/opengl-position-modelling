@@ -3,12 +3,13 @@ file(GLOB MODELLING_SRC
   "*.cpp"
 )
 
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+add_subdirectory (sensor-simulators) 
+
 add_library (modelling ${MODELLING_SRC})
 
 target_link_libraries(
   modelling 
+  sensor-simulators
   common
   Eigen3::Eigen
 )

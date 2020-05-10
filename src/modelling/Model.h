@@ -9,6 +9,8 @@
 
 #include "PathPlanner.h"
 #include "GyroSimulator.h"
+#include "AccelerometerSimulator.h"
+#include "PositionSensorSimulator.h"
 
 
 class Model {
@@ -17,7 +19,9 @@ private:
   std::future<void>                    m_exitSignalFuture;
   PathPlanner                          m_pathPlanner;
   GyroSimulator                        m_gyroSimulator;
-  int                                  m_pathIndex;
+  AccelerometerSimulator               m_accelerometerSimulator;
+  PositionSensorSimulator              m_positionSensorSimulator;
+  unsigned int                         m_pathIndex;
   std::promise<Eigen::Vector3f>        m_currentPosition;
   std::shared_future<Eigen::Vector3f>  m_currentPositionFuture;
   std::thread                          m_modellingThread;

@@ -41,6 +41,7 @@ public:
 	void printIndices() const;
 
   Renderable(const Renderable &newRenderable);
+  Renderable operator=(const Renderable& additionalRenderable);
   Renderable operator+(const Renderable& additionalRenderable);
   Renderable operator+=(const Renderable& additionalRenderable);
 };

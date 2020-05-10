@@ -80,6 +80,14 @@ Renderable::Renderable(const Renderable &newRenderable) {
 	this->m_totalVertexElements = newRenderable.m_totalVertexElements;
 }
 
+Renderable Renderable::operator=(const Renderable& newRenderable) {
+  this->m_vertices            = newRenderable.m_vertices;
+	this->m_indices             = newRenderable.m_indices;
+	this->m_vertexCount         = newRenderable.m_vertexCount;
+	this->m_totalVertexElements = newRenderable.m_totalVertexElements;
+
+  return *this;
+}
 
 Renderable Renderable::operator+(const Renderable& additionalRenderable) {
   Renderable jointRenderable;
@@ -104,7 +112,7 @@ Renderable Renderable::operator+(const Renderable& additionalRenderable) {
     additionalRenderable.m_indices.begin(), additionalRenderable.m_indices.end(), 
     jointRenderable.m_indices.begin() + this->m_indices.size());
   
-  for (int i = this->m_indices.size(); i < jointRenderable.m_indices.size(); ++i) {
+  for (size_t i = this->m_indices.size(); i < jointRenderable.m_indices.size(); ++i) {
     jointRenderable.m_indices.at(i) += this->m_vertexCount;
   }
 
