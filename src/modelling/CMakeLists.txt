@@ -13,3 +13,7 @@ target_link_libraries(
   common
   Eigen3::Eigen
 )
+
+target_include_directories(modelling PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)

@@ -38,7 +38,7 @@ void Model::execute() {
     if (m_pathIndex < path.size()) {
       
     }
-    Vector3f position = m_positionSensorSimulator.getDataFor(m_pathIndex);
+    // Vector3f position = m_positionSensorSimulator.getDataFor(m_pathIndex);
       
     
     if (m_pathIndex < path.size()) {

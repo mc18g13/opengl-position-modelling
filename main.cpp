@@ -130,7 +130,7 @@ int main( void ) {
     	constexpr float PLOTTING_HEIGHT = PLOTTING_SCALE * HALF_SCREEN_HEIGHT;
       constexpr float PLOTTING_DEPTH  = 10000.0f;
 
-      Shader shader("src/gl-renderer/res/shaders/Basic.shader");
+      Shader shader("src/gl/renderer/res/shaders/Basic.shader");
       shader.bind();
 
       double previousTime = glfwGetTime();
