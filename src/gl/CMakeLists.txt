@@ -15,7 +15,6 @@ include_directories(${GLEW_INCLUDE_DIRS})
 
 add_library (gl STATIC ${GL_SRC})
 
-
 find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)

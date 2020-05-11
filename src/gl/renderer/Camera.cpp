@@ -35,8 +35,8 @@ glm::mat4 Camera::getViewMatrix() {
     m_up);
 }
 
-void Camera::processKeyboard(Camera_Movement direction, float deltaTime) {
-  float velocity = m_movementSpeed * deltaTime;
+void Camera::processKeyboard(Camera_Movement direction, float deltaTimeSeconds) {
+  float velocity = m_movementSpeed * deltaTimeSeconds;
   vec3 changeInXZPlane(m_directionCameraIsFacing.x,0.0f,m_directionCameraIsFacing.z);
   changeInXZPlane = glm::normalize(changeInXZPlane);
   if (direction == FORWARD)

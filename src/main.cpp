@@ -49,7 +49,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;	// time between current frame and last frame
+float deltaTimeSeconds = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
 using namespace std;
@@ -128,7 +128,7 @@ int main( void ) {
       constexpr float PLOTTING_SCALE  = 400;
       constexpr float PLOTTING_WIDTH  = PLOTTING_SCALE * HALF_SCREEN_WIDTH;
     	constexpr float PLOTTING_HEIGHT = PLOTTING_SCALE * HALF_SCREEN_HEIGHT;
-      constexpr float PLOTTING_DEPTH  = 10000.0f;
+      constexpr float PLOTTING_DEPTH  = 2000.0f;
 
       Shader shader("src/gl/renderer/res/shaders/Basic.shader");
       shader.bind();
@@ -153,7 +153,7 @@ int main( void ) {
 
         // while (glfwGetTime() - lastFrame < 0.2);
         float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
+        deltaTimeSeconds = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
         abc += 1;
@@ -233,13 +233,13 @@ int main( void ) {
 
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    camera.processKeyboard(FORWARD, deltaTime);
+    camera.processKeyboard(FORWARD, deltaTimeSeconds);
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    camera.processKeyboard(BACKWARD, deltaTime);
+    camera.processKeyboard(BACKWARD, deltaTimeSeconds);
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    camera.processKeyboard(LEFT, deltaTime);
+    camera.processKeyboard(LEFT, deltaTimeSeconds);
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    camera.processKeyboard(RIGHT, deltaTime);
+    camera.processKeyboard(RIGHT, deltaTimeSeconds);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {

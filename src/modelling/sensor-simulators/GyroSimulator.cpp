@@ -1,11 +1,11 @@
 #include "GyroSimulator.h"
 
-GyroSimulator::GyroSimulator(std::vector<Vector3f> path, float deltaTime) {
+GyroSimulator::GyroSimulator(std::vector<Vector3f> path, float deltaTimeSeconds) {
   
   Quaternionf firstOrientation = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), Vector3f::UnitX());
   Vector3f firstEuler = firstOrientation.toRotationMatrix().eulerAngles(0, 1, 2);
 
-  Vector3f firstEulerWithRespectToTime = firstEuler / deltaTime;
+  Vector3f firstEulerWithRespectToTime = firstEuler / deltaTimeSeconds;
   m_data.push_back(firstEulerWithRespectToTime);
   
   for (int i = 1; i < path.size(); ++i) {
@@ -18,7 +18,7 @@ GyroSimulator::GyroSimulator(std::vector<Vector3f> path, float deltaTime) {
     Vector3f eulerThis = rotationFromXAxisToThisVector.toRotationMatrix().eulerAngles(0, 1, 2);
     
     Vector3f deltaEuler(eulerLast[0] - eulerThis[0], eulerLast[1] - eulerThis[1], eulerLast[2] - eulerThis[2]);
-    Vector3f deltaEulerWithRespectToTime = deltaEuler / deltaTime;
+    Vector3f deltaEulerWithRespectToTime = deltaEuler / deltaTimeSeconds;
     m_data.push_back(deltaEulerWithRespectToTime);
 
     // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");

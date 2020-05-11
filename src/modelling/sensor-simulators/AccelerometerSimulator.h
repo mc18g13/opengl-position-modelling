@@ -5,11 +5,12 @@
 
 class AccelerometerSimulator : public SensorSimulator3D { 
 public:
-  AccelerometerSimulator(std::vector<Vector3f> path, float deltaTime);
+  static const Vector3f GRAVITY;
+  AccelerometerSimulator(std::vector<Vector3f> path, float deltaTimeSeconds);
 
 private:
   Vector3f calculateLinearAccelerationFrom(
-    const Vector3f& startPoint, const Vector3f& previousPoint, const Vector3f& thisPoint, float deltaTime);
+    const Vector3f& startPoint, const Vector3f& previousPoint, const Vector3f& thisPoint, float deltaTimeSeconds);
 };
 
 #endif

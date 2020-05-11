@@ -5,7 +5,7 @@
 
 class GyroSimulator : public SensorSimulator3D { 
 public:
-  GyroSimulator(std::vector<Vector3f> path, float deltaTime);
+  GyroSimulator(std::vector<Vector3f> path, float deltaTimeSeconds);
 };
 
 #endif
