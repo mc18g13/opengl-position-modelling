@@ -1,48 +1,56 @@
 #include "AccelerometerSimulator.h"
 
+namespace {
+  Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");
+}
+
 const Vector3f AccelerometerSimulator::GRAVITY(0,0,-9.80665);
 
 AccelerometerSimulator::AccelerometerSimulator(std::vector<Vector3f> path, float deltaTimeSeconds) {
   
+  Vector3f previousHeading(Vector3f::UnitX());
   Vector3f currentHeading(Vector3f::UnitX());
-
 
   Quaternionf gravityQuaternion;
   gravityQuaternion.w() = 0;
   gravityQuaternion.vec() = GRAVITY;
 
-  Vector3f linearAcceleration  = calculateLinearAccelerationFrom(path.at(0), path.at(0), path.at(0), deltaTimeSeconds);
-  m_data.push_back(linearAcceleration + GRAVITY);
-
-
-  if (path.at(1) != path.at(0)) {
-    currentHeading = path.at(1) - path.at(0);
-  }
-
-  linearAcceleration  = calculateLinearAccelerationFrom(path.at(0), path.at(0), path.at(1), deltaTimeSeconds);
-  Quaternionf orientationOfGravityVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), currentHeading);
-  Vector3f rotatedGravityVector = (orientationOfGravityVector * gravityQuaternion * orientationOfGravityVector.inverse()).vec();
-
-  m_data.push_back(linearAcceleration + rotatedGravityVector);
+  Quaternionf rotatedGravityQuaternion(gravityQuaternion);
   
-  for (int i = 2; i < path.size(); ++i) {
-    Vector3f startPoint    = path.at(i - 2);
-    Vector3f previousPoint = path.at(i - 1);
-    Vector3f thisPoint     = path.at(i);
+  const int indexAtWhichAccelerationCanBeCalcalulated = 2;
+  for (int i = 0; i < path.size(); ++i) {
+
+    Vector3f startPoint;
+    Vector3f previousPoint;
+
+    if (i < indexAtWhichAccelerationCanBeCalcalulated) {
+      startPoint    = path.at(0);
+      previousPoint = path.at(0);
+    } else {
+      startPoint    = path.at(i - 2);
+      previousPoint = path.at(i - 1);
+    }
+
+    Vector3f thisPoint = path.at(i);
 
     if (thisPoint != previousPoint) {
       currentHeading = thisPoint - previousPoint;
     }
 
+    std::cout << previousHeading.format(cleanFmt) << " " << currentHeading.format(cleanFmt) << std::endl; 
+    std::cout << previousHeading.format(cleanFmt) << " " << currentHeading.format(cleanFmt) << std::endl; 
+    std::cout << previousHeading.format(cleanFmt) << " " << currentHeading.format(cleanFmt) << std::endl; 
+    std::cout << previousHeading.format(cleanFmt) << " " << currentHeading.format(cleanFmt) << std::endl; 
+
     Vector3f linearAcceleration  = calculateLinearAccelerationFrom(startPoint, previousPoint, thisPoint, deltaTimeSeconds);
-    Quaternionf orientationOfGravityVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), currentHeading);
-    Vector3f rotatedGravityVector = (orientationOfGravityVector * gravityQuaternion * orientationOfGravityVector.inverse()).vec();
+    Quaternionf orientationOfGravityVector = quaternionToGetFromOneOrientationToAnother(previousHeading, currentHeading);
+    rotatedGravityQuaternion = orientationOfGravityVector.inverse() * rotatedGravityQuaternion * orientationOfGravityVector;
+    Vector3f rotatedGravityVector = rotatedGravityQuaternion.vec();
 
     Vector3f combinedAcceleration = linearAcceleration + rotatedGravityVector;
     m_data.push_back(combinedAcceleration);
 
-
-    // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");
+    previousHeading = currentHeading;
 
   }
   

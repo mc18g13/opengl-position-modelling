@@ -1,14 +1,12 @@
-// #include "foo.h"
 #include "AccelerometerSimulator.h"
 #include "AccelerometerSimulatorTest.h"
 
-using ::testing::Return;
+namespace {
+  float deltaTimeSeconds = 0.001;
+}
 
 AccelerometerSimulatorTest::AccelerometerSimulatorTest() {
-//     // Have qux return true by default
-//     ON_CALL(m_bar,qux()).WillByDefault(Return(true));
-//     // Have norf return false by default
-//     ON_CALL(m_bar,norf()).WillByDefault(Return(false));
+
 }
 
 AccelerometerSimulatorTest::~AccelerometerSimulatorTest() {};
@@ -22,7 +20,7 @@ TEST_F(AccelerometerSimulatorTest, NoChangeInAttitudeProvideSameDataAsGravityVec
   path.push_back(Vector3f(0,0,0));
   path.push_back(Vector3f(0,0,0));
   path.push_back(Vector3f(0,0,0));
-  AccelerometerSimulator simulator(path, 0.001);
+AccelerometerSimulator simulator(path, deltaTimeSeconds);
 
   EXPECT_EQ(simulator.getDataFor(0), AccelerometerSimulator::GRAVITY);
 }
@@ -34,15 +32,34 @@ TEST_F(AccelerometerSimulatorTest, NoChangeInPitchOrRollProvideSameDataAsGravity
   path.push_back(Vector3f(1,1,0));
   path.push_back(Vector3f(1,1,0));
   path.push_back(Vector3f(1,1,0));
-  AccelerometerSimulator simulator(path, 0.001);
+  AccelerometerSimulator simulator(path, deltaTimeSeconds);
 
   EXPECT_EQ(simulator.getDataFor(path.size() - 1), AccelerometerSimulator::GRAVITY);
 }
 
-// TEST_F(AccelerometerSimulatorTest, SometimesBazFalseIsTrue) {
-//     Foo foo(m_bar);
-//     // Have norf return true for once
-//     EXPECT_CALL(m_bar,norf()).WillOnce(Return(true));
-//     EXPECT_EQ(foo.baz(false), true);
-// }
+TEST_F(AccelerometerSimulatorTest, PitchFrontUpGravityActsInXAxis) {
+  std::vector<Eigen::Vector3f> path;
+  path.push_back(Vector3f(0,0,0));
+  path.push_back(Vector3f(0,0,1));
+  path.push_back(Vector3f(0,0,1));
+  path.push_back(Vector3f(0,0,1));
+  path.push_back(Vector3f(0,0,1));
+  AccelerometerSimulator simulator(path, deltaTimeSeconds);
+
+  EXPECT_EQ(simulator.getDataFor(path.size() - 1), Vector3f(AccelerometerSimulator::GRAVITY[2],0,0));
+}
+
+
+TEST_F(AccelerometerSimulatorTest, RollRightGravityActsInYAxis) {
+  std::vector<Eigen::Vector3f> path;
+  path.push_back(Vector3f(0,0,0));
+  path.push_back(Vector3f(0,1,0));
+  path.push_back(Vector3f(0,1,1));
+  path.push_back(Vector3f(1,1,1));
+  path.push_back(Vector3f(1,1,1));
+  path.push_back(Vector3f(1,1,1));
+  AccelerometerSimulator simulator(path, deltaTimeSeconds);
+
+  EXPECT_EQ(simulator.getDataFor(path.size() - 1), Vector3f(0,AccelerometerSimulator::GRAVITY[2],0));
+}
 
