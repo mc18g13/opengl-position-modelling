@@ -5,7 +5,7 @@
 
 class PositionSensorSimulator : public SensorSimulator3D {
 public:
-  PositionSensorSimulator(std::vector<Vector3f> path, float deltaTimeSeconds);
+  PositionSensorSimulator(std::vector<Vector3d> path, double deltaTimeSeconds);
 };
 
 #endif

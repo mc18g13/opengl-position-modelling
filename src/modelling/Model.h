@@ -22,8 +22,8 @@ private:
   AccelerometerSimulator               m_accelerometerSimulator;
   PositionSensorSimulator              m_positionSensorSimulator;
   unsigned int                         m_pathIndex;
-  std::promise<Eigen::Vector3f>        m_currentPosition;
-  std::shared_future<Eigen::Vector3f>  m_currentPositionFuture;
+  std::promise<Eigen::Vector3d>        m_currentPosition;
+  std::shared_future<Eigen::Vector3d>  m_currentPositionFuture;
   std::thread                          m_modellingThread;
 
   
@@ -32,7 +32,7 @@ public:
   ~Model();
   void execute();
   void stop();
-  std::shared_future<Eigen::Vector3f> getPosition();
+  std::shared_future<Eigen::Vector3d> getPosition();
   int getIndex();
 
 private:

@@ -8,10 +8,10 @@
 
 class SensorSimulator3D : public EigenMathematics {
 protected:
-  std::vector<Vector3f> m_data;
+  std::vector<Vector3d> m_data;
 
 public:
-  Vector3f getDataFor(int index);
+  Vector3d getDataFor(int index);
 };
 
 #endif

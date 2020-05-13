@@ -2,7 +2,7 @@
 #include <chrono>
 #include <iostream>
 
-using Eigen::Vector3f;
+using Eigen::Vector3d;
 
 namespace {
   constexpr double SECONDS_TO_MILLIS  = 1000;
@@ -32,17 +32,17 @@ Model::~Model() {
 
 void Model::execute() {
   while (!stopRequested()) {
-    std::vector<Vector3f> path = m_pathPlanner.getPath();
+    std::vector<Vector3d> path = m_pathPlanner.getPath();
     
 
     if (m_pathIndex < path.size()) {
       
     }
-    // Vector3f position = m_positionSensorSimulator.getDataFor(m_pathIndex);
+    // Vector3d position = m_positionSensorSimulator.getDataFor(m_pathIndex);
       
     
     if (m_pathIndex < path.size()) {
-      Vector3f pathPoint = path.at(m_pathIndex);
+      Vector3d pathPoint = path.at(m_pathIndex);
       
       if (m_currentPositionFuture.valid() ) {
         
@@ -67,9 +67,9 @@ void Model::stop() {
   m_exitSignal.set_value();
 }
 
-std::shared_future<Vector3f> Model::getPosition() {
+std::shared_future<Vector3d> Model::getPosition() {
   m_pathIndex++;
-  m_currentPosition = std::promise<Vector3f>();
+  m_currentPosition = std::promise<Vector3d>();
   m_currentPositionFuture = m_currentPosition.get_future();
   return m_currentPositionFuture;
 }
