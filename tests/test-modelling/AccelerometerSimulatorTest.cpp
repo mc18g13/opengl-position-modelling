@@ -136,7 +136,6 @@ TEST_F(AccelerometerSimulatorTest, ConstantAccelerationPitchedUpProducesSameAcce
 
   AccelerometerSimulator simulator(path, deltaTimeSeconds);
 
-
   const double errorForComparsionToBeTrue = 0.001;
   ASSERT_NEAR(simulator.getDataFor(path.size() - 1)[0], acceleration + AccelerometerSimulator::GRAVITY[2], errorForComparsionToBeTrue);
 }
