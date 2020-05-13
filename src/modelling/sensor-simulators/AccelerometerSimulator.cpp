@@ -1,64 +1,100 @@
 #include "AccelerometerSimulator.h"
 
-const Vector3f AccelerometerSimulator::GRAVITY(0,0,-9.80665);
+namespace {
+  Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");
+}
 
-AccelerometerSimulator::AccelerometerSimulator(std::vector<Vector3f> path, float deltaTimeSeconds) {
+const Vector3d AccelerometerSimulator::GRAVITY(0,0,-9.80665);
+
+AccelerometerSimulator::AccelerometerSimulator(std::vector<Vector3d> path, double deltaTimeSeconds) {
   
-  Vector3f currentHeading(Vector3f::UnitX());
+  Vector3d previousHeading(Vector3d::UnitX());
+  Vector3d currentHeading(Vector3d::UnitX());
 
-
-  Quaternionf gravityQuaternion;
+  Quaterniond gravityQuaternion;
   gravityQuaternion.w() = 0;
   gravityQuaternion.vec() = GRAVITY;
 
-  Vector3f linearAcceleration  = calculateLinearAccelerationFrom(path.at(0), path.at(0), path.at(0), deltaTimeSeconds);
-  m_data.push_back(linearAcceleration + GRAVITY);
-
-
-  if (path.at(1) != path.at(0)) {
-    currentHeading = path.at(1) - path.at(0);
-  }
-
-  linearAcceleration  = calculateLinearAccelerationFrom(path.at(0), path.at(0), path.at(1), deltaTimeSeconds);
-  Quaternionf orientationOfGravityVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), currentHeading);
-  Vector3f rotatedGravityVector = (orientationOfGravityVector * gravityQuaternion * orientationOfGravityVector.inverse()).vec();
-
-  m_data.push_back(linearAcceleration + rotatedGravityVector);
+  Quaterniond rotatedGravityQuaternion(gravityQuaternion);
   
-  for (int i = 2; i < path.size(); ++i) {
-    Vector3f startPoint    = path.at(i - 2);
-    Vector3f previousPoint = path.at(i - 1);
-    Vector3f thisPoint     = path.at(i);
+  const int indexAtWhichAccelerationCanBeCalcalulated = 2;
+  for (int i = 0; i < path.size(); ++i) {
 
-    if (thisPoint != previousPoint) {
-      currentHeading = thisPoint - previousPoint;
+    Vector3d startPoint;
+    Vector3d previousPoint;
+
+    if (i < indexAtWhichAccelerationCanBeCalcalulated) {
+      startPoint    = path.at(0);
+      previousPoint = path.at(0);
+    } else {
+      startPoint    = path.at(i - 2);
+      previousPoint = path.at(i - 1);
     }
 
-    Vector3f linearAcceleration  = calculateLinearAccelerationFrom(startPoint, previousPoint, thisPoint, deltaTimeSeconds);
-    Quaternionf orientationOfGravityVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), currentHeading);
-    Vector3f rotatedGravityVector = (orientationOfGravityVector * gravityQuaternion * orientationOfGravityVector.inverse()).vec();
+    Vector3d thisPoint = path.at(i);
 
-    Vector3f combinedAcceleration = linearAcceleration + rotatedGravityVector;
+    if (thisPoint != previousPoint) {
+      currentHeading = (thisPoint - previousPoint).normalized();
+    }
+
+    Quaterniond orientationChangeSinceLastHeadingUpdate = quaternionToGetFromOneOrientationToAnother(previousHeading, currentHeading);
+    orientationChangeSinceLastHeadingUpdate = orientationChangeSinceLastHeadingUpdate.normalized();
+
+    Quaterniond quaternionOfLinearAcceleration;
+    quaternionOfLinearAcceleration.vec() = calculateLinearAccelerationFrom(startPoint, previousPoint, thisPoint, deltaTimeSeconds);
+    quaternionOfLinearAcceleration.w()   = 0;
+
+    Quaterniond orientationChangeFromOrigin = quaternionToGetFromOneOrientationToAnother(Vector3d::UnitX(), currentHeading);
+    orientationChangeFromOrigin = orientationChangeFromOrigin.normalized();
+    
+    Quaterniond quaternionOfLinearAccelerationRotated = 
+      orientationChangeFromOrigin * quaternionOfLinearAcceleration * orientationChangeFromOrigin.inverse();
+
+    Vector3d linearAcceleration  = quaternionOfLinearAccelerationRotated.vec();
+    
+    rotatedGravityQuaternion = orientationChangeSinceLastHeadingUpdate * rotatedGravityQuaternion * orientationChangeSinceLastHeadingUpdate.inverse();
+    Vector3d rotatedGravityVector = rotatedGravityQuaternion.vec();
+
+    Vector3d combinedAcceleration = linearAcceleration + rotatedGravityVector;
     m_data.push_back(combinedAcceleration);
 
-
-    // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");
+    previousHeading = currentHeading;
 
   }
   
 }
 
+#include <iomanip>
+Vector3d AccelerometerSimulator::calculateLinearAccelerationFrom(
+  const Vector3d& startPoint, const Vector3d& previousPoint, const Vector3d& thisPoint, double deltaTimeSeconds) {
 
-Vector3f AccelerometerSimulator::calculateLinearAccelerationFrom(
-  const Vector3f& startPoint, const Vector3f& previousPoint, const Vector3f& thisPoint, float deltaTimeSeconds) {
-  Vector3f lastDeltaPosition = previousPoint - startPoint;
-  Vector3f lastVelocity      = lastDeltaPosition / deltaTimeSeconds;
+  std::cout << std::fixed;
+  std::cout << std::setprecision(14);
+
+  Vector3d startPointDouble(startPoint[0],startPoint[1],startPoint[2]);
+  Vector3d previousPointDouble(previousPoint[0],previousPoint[1],previousPoint[2]);
+  Vector3d thisPointDouble(thisPoint[0],thisPoint[1],thisPoint[2]);
+
+  double frequency = 1 / deltaTimeSeconds;
+  Vector3d lastDeltaPosition = previousPointDouble - startPointDouble;
+  Vector3d lastVelocity      = lastDeltaPosition * frequency;
   
-  Vector3f thisDeltaPosition = thisPoint - previousPoint;
-  Vector3f thisVelocity      = thisDeltaPosition / deltaTimeSeconds;
+  Vector3d thisDeltaPosition = thisPointDouble - previousPointDouble;
+  Vector3d thisVelocity      = thisDeltaPosition * frequency;
 
-  Vector3f deltaVelocity = thisVelocity - lastVelocity;
-  Vector3f acceleration  = deltaVelocity / deltaTimeSeconds;
+  // std::cout << thisDeltaPosition[2] << std::endl;
 
-  return acceleration;
+  Vector3d deltaVelocity = thisVelocity - lastVelocity;
+  // std::cout << deltaVelocity.format(cleanFmt) << std::endl;
+  double dividy = deltaVelocity[2] * frequency;
+  // std::cout << deltaVelocity[2] << std::endl;
+  // if (abs(dividy - 1)  < 0.01) {
+  //   std::cout << "shitt" << std::endl;
+  // }
+  Vector3d acceleration  = deltaVelocity * frequency;
+
+  // std::cout << (deltaVelocity * frequency).format(cleanFmt) << std::endl;
+
+
+  return Vector3d((double)acceleration[0],(double)acceleration[1],(double)acceleration[2]);
 }

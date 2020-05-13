@@ -5,13 +5,14 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-using Eigen::Vector3f;
-using Eigen::Quaternionf;
-using Eigen::Matrix3f;
+using Eigen::Vector3d;
+using Eigen::Quaterniond;
+using Eigen::Matrix3d;
 
 class EigenMathematics {
 public: 
-  Quaternionf quaternionToGetFromOneOrientationToAnother(const Vector3f& from, const Vector3f& to);
+  Quaterniond quaternionToGetFromOneOrientationToAnother(const Vector3d& from, const Vector3d& to);
+  bool compareVectors(const Vector3d& v1, const Vector3d& v2, double errorForComparison = 0.0001);
 };
 
 #endif

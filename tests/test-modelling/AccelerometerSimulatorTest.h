@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "mockbar.h"
 
 class AccelerometerSimulatorTest : public ::testing::Test {
 

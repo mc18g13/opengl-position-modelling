@@ -4,10 +4,10 @@
 #include <math.h>
 #include <iostream>
 
-using Eigen::Vector3f;
-using Eigen::Matrix3f;
-using Eigen::Quaternionf;
-using Eigen::AngleAxisf;
+using Eigen::Vector3d;
+using Eigen::Quaterniond;
+using Eigen::AngleAxisd;
+using Eigen::Matrix3d;
 
 
 PathPlanner::PathPlanner() :
@@ -15,11 +15,11 @@ PathPlanner::PathPlanner() :
   setupPathPoints(2000);
 }
 
-std::vector<Eigen::Vector3f> PathPlanner::getPath() {
+std::vector<Eigen::Vector3d> PathPlanner::getPath() {
   return m_pathPoints;
 }
 
-void PathPlanner::addPointToPath(const Eigen::Vector3f& nextPoint) {
+void PathPlanner::addPointToPath(const Eigen::Vector3d& nextPoint) {
   m_pathPoints.push_back(nextPoint);
 }
 
@@ -29,22 +29,22 @@ void PathPlanner::setupPathPoints(int pointCount) {
 
 void PathPlanner::addCircleOfPointsToPath(int pointCount) {
   
-  Matrix3f tiltPathUp(AngleAxisf(M_PI/8, Vector3f::UnitX() - Vector3f::UnitY()));
+  Matrix3d tiltPathUp(AngleAxisd(M_PI/8, Vector3d::UnitX() - Vector3d::UnitY()));
 
-  Eigen::Vector3f firstPointOnCircleBeforeTranslation(-200,-200,0);
-  float radius = firstPointOnCircleBeforeTranslation.norm();
-  Eigen::Vector3f centreOfCircle(radius,radius,0);
+  Eigen::Vector3d firstPointOnCircleBeforeTranslation(-200,-200,0);
+  double radius = firstPointOnCircleBeforeTranslation.norm();
+  Eigen::Vector3d centreOfCircle(radius,radius,0);
 
-  Eigen::Vector3f normalToPlaneCircleWillBeIn(Vector3f::UnitZ());
-  constexpr float DEGREES_IN_CIRCLE = 360;
-  constexpr float TO_RADIANS = 2 * M_PI / DEGREES_IN_CIRCLE;
-  float angleChangeForPointCount = DEGREES_IN_CIRCLE / (float)pointCount;
+  Eigen::Vector3d normalToPlaneCircleWillBeIn(Vector3d::UnitZ());
+  constexpr double DEGREES_IN_CIRCLE = 360;
+  constexpr double TO_RADIANS = 2 * M_PI / DEGREES_IN_CIRCLE;
+  double angleChangeForPointCount = DEGREES_IN_CIRCLE / (double)pointCount;
 
   int eighthOfPathCount = pointCount / 8;
   for (int i = 0; i < eighthOfPathCount; ++i) {
-    float amountToMoveForThisIteration = i * firstPointOnCircleBeforeTranslation.norm()/eighthOfPathCount;
-    float nextXToFollowXAxis = amountToMoveForThisIteration;
-    Eigen::Vector3f nextPointToFollowXAxis(nextXToFollowXAxis,0,0);
+    double amountToMoveForThisIteration = i * firstPointOnCircleBeforeTranslation.norm()/eighthOfPathCount;
+    double nextXToFollowXAxis = amountToMoveForThisIteration;
+    Eigen::Vector3d nextPointToFollowXAxis(nextXToFollowXAxis,0,0);
       
     addPointToPath(tiltPathUp * nextPointToFollowXAxis);
   }
@@ -52,28 +52,28 @@ void PathPlanner::addCircleOfPointsToPath(int pointCount) {
   int sevenEighthPathCount = 7 * pointCount / 8;
   for (int i = eighthOfPathCount; i < sevenEighthPathCount; ++i) {
 
-    float angle = (float)i * angleChangeForPointCount;
-    float angleInRadians = angle * TO_RADIANS;
-    float quaternionAngleInput = angleInRadians / 2;
-    Eigen::Quaternionf rotation(
+    double angle = (double)i * angleChangeForPointCount;
+    double angleInRadians = angle * TO_RADIANS;
+    double quaternionAngleInput = angleInRadians / 2;
+    Eigen::Quaterniond rotation(
       std::cos(quaternionAngleInput), 
       std::sin(quaternionAngleInput) * normalToPlaneCircleWillBeIn[0], 
       std::sin(quaternionAngleInput) * normalToPlaneCircleWillBeIn[1], 
       std::sin(quaternionAngleInput) * normalToPlaneCircleWillBeIn[2]);
 
-    Eigen::Quaternionf firstPointAsQuaternion;
+    Eigen::Quaterniond firstPointAsQuaternion;
     firstPointAsQuaternion.w()   = 0;
     firstPointAsQuaternion.vec() = firstPointOnCircleBeforeTranslation;
 
-    Eigen::Quaternionf currentPointOnCircleAsQuaternion = rotation * firstPointAsQuaternion * rotation.inverse();    
+    Eigen::Quaterniond currentPointOnCircleAsQuaternion = rotation * firstPointAsQuaternion * rotation.inverse();    
     addPointToPath(tiltPathUp * (currentPointOnCircleAsQuaternion.vec() + centreOfCircle));
   }
   
   for (int i = 0; i < eighthOfPathCount; ++i) {
-    float yStartPosition = firstPointOnCircleBeforeTranslation.norm();
-    float amountToMoveForThisIteration = i * yStartPosition/eighthOfPathCount;
-    float nextYToFollowYAxis = yStartPosition - amountToMoveForThisIteration;
-    Eigen::Vector3f nextPointToFollowYAxis(0,nextYToFollowYAxis,0);
+    double yStartPosition = firstPointOnCircleBeforeTranslation.norm();
+    double amountToMoveForThisIteration = i * yStartPosition/eighthOfPathCount;
+    double nextYToFollowYAxis = yStartPosition - amountToMoveForThisIteration;
+    Eigen::Vector3d nextPointToFollowYAxis(0,nextYToFollowYAxis,0);
       
     addPointToPath(tiltPathUp * nextPointToFollowYAxis);
   }

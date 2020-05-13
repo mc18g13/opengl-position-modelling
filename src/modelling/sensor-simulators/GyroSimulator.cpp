@@ -1,24 +1,24 @@
 #include "GyroSimulator.h"
 
-GyroSimulator::GyroSimulator(std::vector<Vector3f> path, float deltaTimeSeconds) {
+GyroSimulator::GyroSimulator(std::vector<Vector3d> path, double deltaTimeSeconds) {
   
-  Quaternionf firstOrientation = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), Vector3f::UnitX());
-  Vector3f firstEuler = firstOrientation.toRotationMatrix().eulerAngles(0, 1, 2);
+  Quaterniond firstOrientation = quaternionToGetFromOneOrientationToAnother(Vector3d::UnitX(), Vector3d::UnitX());
+  Vector3d firstEuler = firstOrientation.toRotationMatrix().eulerAngles(0, 1, 2);
 
-  Vector3f firstEulerWithRespectToTime = firstEuler / deltaTimeSeconds;
+  Vector3d firstEulerWithRespectToTime = firstEuler / deltaTimeSeconds;
   m_data.push_back(firstEulerWithRespectToTime);
   
   for (int i = 1; i < path.size(); ++i) {
-    Vector3f from = path.at(i - 1);
-    Vector3f to   = path.at(i);
+    Vector3d from = path.at(i - 1);
+    Vector3d to   = path.at(i);
 
-    Quaternionf rotationFromXAxisToLastVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), from);
-    Quaternionf rotationFromXAxisToThisVector = quaternionToGetFromOneOrientationToAnother(Vector3f::UnitX(), to);
-    Vector3f eulerLast = rotationFromXAxisToLastVector.toRotationMatrix().eulerAngles(0, 1, 2);
-    Vector3f eulerThis = rotationFromXAxisToThisVector.toRotationMatrix().eulerAngles(0, 1, 2);
+    Quaterniond rotationFromXAxisToLastVector = quaternionToGetFromOneOrientationToAnother(Vector3d::UnitX(), from);
+    Quaterniond rotationFromXAxisToThisVector = quaternionToGetFromOneOrientationToAnother(Vector3d::UnitX(), to);
+    Vector3d eulerLast = rotationFromXAxisToLastVector.toRotationMatrix().eulerAngles(0, 1, 2);
+    Vector3d eulerThis = rotationFromXAxisToThisVector.toRotationMatrix().eulerAngles(0, 1, 2);
     
-    Vector3f deltaEuler(eulerLast[0] - eulerThis[0], eulerLast[1] - eulerThis[1], eulerLast[2] - eulerThis[2]);
-    Vector3f deltaEulerWithRespectToTime = deltaEuler / deltaTimeSeconds;
+    Vector3d deltaEuler(eulerLast[0] - eulerThis[0], eulerLast[1] - eulerThis[1], eulerLast[2] - eulerThis[2]);
+    Vector3d deltaEulerWithRespectToTime = deltaEuler / deltaTimeSeconds;
     m_data.push_back(deltaEulerWithRespectToTime);
 
     // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");

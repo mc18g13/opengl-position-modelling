@@ -103,7 +103,7 @@ GLFWwindow* initWindow()
     return window;
 }
 
-vec3 stateSpaceToGraphicSpace(Eigen::Vector3f& state) {
+vec3 stateSpaceToGraphicSpace(Eigen::Vector3d& state) {
   return vec3(state[1], state[2], state[0]);
 }
 
@@ -184,10 +184,10 @@ int main( void ) {
         plotArea.setModel(sceneModel);
         plotArea.draw(shader);
 
-        std::shared_future<Eigen::Vector3f> futurePosition = stateModel.getPosition();
+        std::shared_future<Eigen::Vector3d> futurePosition = stateModel.getPosition();
 
         if (futurePosition.wait_for(std::chrono::milliseconds(5)) != std::future_status::timeout) {
-          Eigen::Vector3f position = futurePosition.get();
+          Eigen::Vector3d position = futurePosition.get();
           glm::vec3 positionDrawable = stateSpaceToGraphicSpace(position);
 
           // Eigen::IOFormat cleanFmt(4, 0, ", ", " ", "[", "]");

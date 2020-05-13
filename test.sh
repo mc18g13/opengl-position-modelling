@@ -2,6 +2,6 @@
 
 cd build
 
-ctest -V 
+ctest $1 
 
 cd ../
